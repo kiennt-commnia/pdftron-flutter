@@ -208,6 +208,7 @@ static NSString * const PTGetPlatformVersionKey = @"getPlatformVersion";
 static NSString * const PTGetVersionKey = @"getVersion";
 static NSString * const PTInitializeKey = @"initialize";
 static NSString * const PTOpenDocumentKey = @"openDocument";
+static NSString * const PTOpenDocumentDifferenceKey = @"openDocumentDifference";
 static NSString * const PTImportAnnotationsKey = @"importAnnotations";
 static NSString * const PTExportAnnotationsKey = @"exportAnnotations";
 static NSString * const PTFlattenAnnotationsKey = @"flattenAnnotations";
@@ -280,6 +281,8 @@ static NSString * const PTSetFitModeKey = @"setFitMode";
 static NSString * const PTGetAnnotationsOnPageKey = @"getAnnotationsOnPage";
 
 // argument
+static NSString * const PTDocument1ArgumentKey = @"document1";
+static NSString * const PTDocument2ArgumentKey = @"document2";
 static NSString * const PTDocumentArgumentKey = @"document";
 static NSString * const PTPasswordArgumentKey = @"password";
 static NSString * const PTConfigArgumentKey = @"config";

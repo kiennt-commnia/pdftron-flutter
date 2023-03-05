@@ -1530,6 +1530,8 @@
         [PTPDFNet Initialize:licenseKey];
     } else if ([call.method isEqualToString:PTOpenDocumentKey]) {
         [self handleOpenDocumentMethod:call.arguments resultToken:result];
+    } else if ([call.method isEqualToString:PTOpenDocumentDifferenceKey]) {
+        [self handleOpenDocumentDifferenceMethod:call.arguments resultToken:result];
     } else if ([call.method isEqualToString:PTImportAnnotationsKey]) {
         NSString *xfdf = [PdftronFlutterPlugin PT_idAsNSString:call.arguments[PTXfdfArgumentKey]];;
         [self importAnnotations:xfdf resultToken:result];
@@ -1913,6 +1915,93 @@
             [self.tabbedDocumentViewController openDocumentWithURL:fileURL
                                                           password:password];
         }
+    }
+    
+    if (!self.tabbedDocumentViewController.navigationController) {
+        
+        [self presentTabbedDocumentViewController];
+    }
+    
+    ((PTFlutterDocumentController*)self.tabbedDocumentViewController.childViewControllers.lastObject).openResult = flutterResult;
+    
+    PTFlutterDocumentController *documentController = (PTFlutterDocumentController *) [self getDocumentController];
+    if (!documentController.isDocCtrlrConfigured) {
+        [[self class] configureDocumentController:documentController
+                                           withConfig:self.config];
+        documentController.docCtrlrConfigured = YES;
+    }
+}
+
+- (void)handleOpenDocumentDifferenceMethod:(NSDictionary<NSString *, id> *)arguments resultToken:(FlutterResult)flutterResult
+    {
+        NSLog(@"NSLog handleOpenDocumentDifferenceMethod called");
+        // debugPrint(@"debugPrint handleOpenDocumentDifferenceMethod called");
+    // Get document arguments.
+    NSString *document1 = nil;
+    NSString *document2 = nil;
+    id document1Value = arguments[PTDocument1ArgumentKey];
+    id document2Value = arguments[PTDocument2ArgumentKey];
+    if ([document1Value isKindOfClass:[NSString class]]) {
+        document1 = (NSString *)document1Value;
+    }
+    if ([document2Value isKindOfClass:[NSString class]]) {
+        document2 = (NSString *)document2Value;
+    }
+    if (document1.length == 0 || document2.length == 0) {
+        // error handling
+        return;
+    }
+    
+    NSString* config = arguments[PTConfigArgumentKey];
+    self.config = config;
+    
+    // get base
+    
+    if (!self.tabbedDocumentViewController) {
+        [self initTabbedDocumentViewController];
+    }
+    
+    [PdftronFlutterPlugin configureTabbedDocumentViewController:self.tabbedDocumentViewController withConfig:config];
+    
+    NSError* error;
+    
+    NSDictionary *configDict = [PdftronFlutterPlugin PT_idAsNSDict:[PdftronFlutterPlugin PT_JSONStringToId:config]];
+    
+    bool isBase64 = NO;
+    if([[configDict allKeys] containsObject:PTIsBase64StringKey]) {
+        NSNumber* isBase64Number= [PdftronFlutterPlugin getConfigValue:configDict configKey:PTIsBase64StringKey class:[NSNumber class] error:&error];
+        if (error) {
+            NSLog(@"An error occurs with config %@: %@", PTIsBase64StringKey, error.localizedDescription);
+        }
+        
+        isBase64 = [isBase64Number boolValue];
+    }
+    
+    if (!isBase64) {
+        // Compose visual diff
+        PTPDFDoc *doc1 = [[PTPDFDoc alloc] initWithFilepath: (NSString *)document1];
+        PTPDFDoc *doc2 = [[PTPDFDoc alloc] initWithFilepath: (NSString *)document2];
+        PTPage *page1 = [doc1 GetPage:1];
+        PTPage *page2 = [doc2 GetPage:1];
+        PTDiffOptions *diffOptions = [[PTDiffOptions alloc] init];
+        PTColorPt *colorA = [[PTColorPt alloc] initWithX:(double)1.0 y:(double)0.0 z:(double)0.0 w:(double)0.0];
+        PTColorPt *colorB = [[PTColorPt alloc] initWithX:(double)0.0 y:(double)1.0 z:(double)1.0 w:(double)0.0];
+        [diffOptions SetColorA:colorA];
+        [diffOptions SetColorB:colorB];
+        [diffOptions SetBlendMode: (PTBlendMode)e_ptbl_darken];
+        PTPDFDoc *doc = [[PTPDFDoc alloc] init];
+        [doc AppendVisualDiff:page1 p2:page2 opts:diffOptions];
+        // Write visual diff to file
+        NSMutableString *path = [[NSMutableString alloc] init];
+        [path appendFormat:@"%@tmp%@%@", NSTemporaryDirectory(), [[NSUUID UUID] UUIDString], @".pdf"];
+        [doc SaveToFile:(NSString *)path flags:(unsigned int)0];
+        NSURL *fileURL = [NSURL fileURLWithPath:path isDirectory:NO];
+        [self.tabbedDocumentViewController openDocumentWithURL:fileURL];
+    } else {
+        // TODO: IMPLEMENT BASE64
+        NSLog(@"Error: openDocumentDifference does not support base64");
+        flutterResult([FlutterError errorWithCode:@"open_document_difference" message:@"Failed to open document difference" details:@"Error: Document difference does not support base64"]);
+        return;
     }
     
     if (!self.tabbedDocumentViewController.navigationController) {

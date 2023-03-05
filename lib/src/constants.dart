@@ -5,6 +5,7 @@ class Functions {
   static const getVersion = "getVersion";
   static const initialize = "initialize";
   static const openDocument = "openDocument";
+  static const openDocumentDifference = "openDocumentDifference";
   static const getSavedSignatures = "getSavedSignatures";
   static const getSavedSignatureFolder = "getSavedSignatureFolder";
 
@@ -88,6 +89,8 @@ class Functions {
 /// Parameters of functions.
 class Parameters {
   static const licenseKey = "licenseKey";
+  static const document1 = "document1";
+  static const document2 = "document2";
   static const document = "document";
   static const password = "password";
   static const config = "config";
