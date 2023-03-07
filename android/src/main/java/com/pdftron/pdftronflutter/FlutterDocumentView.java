@@ -6,8 +6,11 @@ import android.view.View;
 import androidx.fragment.app.FragmentActivity;
 import androidx.fragment.app.FragmentManager;
 
+import com.pdftron.common.PDFNetException;
 import com.pdftron.pdftronflutter.helpers.PluginUtils;
 import com.pdftron.pdftronflutter.views.DocumentView;
+
+import java.io.IOException;
 
 import io.flutter.plugin.common.BinaryMessenger;
 import io.flutter.plugin.common.EventChannel;
@@ -36,8 +39,12 @@ import static com.pdftron.pdftronflutter.helpers.PluginUtils.EVENT_ANNOTATION_TO
 import static com.pdftron.pdftronflutter.helpers.PluginUtils.EVENT_APP_BAR_BUTTON_PRESSED;
 
 import static com.pdftron.pdftronflutter.helpers.PluginUtils.FUNCTION_OPEN_DOCUMENT;
+import static com.pdftron.pdftronflutter.helpers.PluginUtils.FUNCTION_OPEN_DOCUMENT_DIFFERENCE;
 import static com.pdftron.pdftronflutter.helpers.PluginUtils.FUNCTION_SET_LEADING_NAV_BUTTON_ICON;
 import static com.pdftron.pdftronflutter.helpers.PluginUtils.KEY_LEADING_NAV_BUTTON_ICON;
+import static com.pdftron.pdftronflutter.helpers.PluginUtils.KEY_CONFIG;
+import static com.pdftron.pdftronflutter.helpers.PluginUtils.KEY_DOCUMENT1;
+import static com.pdftron.pdftronflutter.helpers.PluginUtils.KEY_DOCUMENT2;
 
 public class FlutterDocumentView implements PlatformView, MethodChannel.MethodCallHandler {
 
@@ -295,6 +302,20 @@ public class FlutterDocumentView implements PlatformView, MethodChannel.MethodCa
                 String password = call.argument("password");
                 String config = call.argument("config");
                 documentView.openDocument(document, password, config, result);
+                break;
+            case FUNCTION_OPEN_DOCUMENT_DIFFERENCE:
+                String document1 = call.argument(KEY_DOCUMENT1);
+                String document2 = call.argument(KEY_DOCUMENT2);
+                String diffConfig = call.argument(KEY_CONFIG);
+                try {
+                    documentView.openDocumentDifference(document1, document2, diffConfig, result);
+                } catch (PDFNetException e) {
+                    e.printStackTrace();
+                    result.error(Long.toString(e.getErrorCode()), "PDFTronException Error: " + e, null);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                    result.error(Long.toString(11), "PDFTron IOException Error: " + e, null);
+                }
                 break;
             case FUNCTION_SET_LEADING_NAV_BUTTON_ICON: {
                 String leadingNavButtonIcon = call.argument(KEY_LEADING_NAV_BUTTON_ICON);

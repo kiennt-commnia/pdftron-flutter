@@ -1934,9 +1934,6 @@
 
 - (void)handleOpenDocumentDifferenceMethod:(NSDictionary<NSString *, id> *)arguments resultToken:(FlutterResult)flutterResult
     {
-        NSLog(@"NSLog handleOpenDocumentDifferenceMethod called");
-        // debugPrint(@"debugPrint handleOpenDocumentDifferenceMethod called");
-    // Get document arguments.
     NSString *document1 = nil;
     NSString *document2 = nil;
     id document1Value = arguments[PTDocument1ArgumentKey];

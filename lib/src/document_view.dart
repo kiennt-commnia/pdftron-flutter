@@ -84,6 +84,23 @@ class DocumentViewController {
     });
   }
 
+  /// Opens document comparison in the viewer with configurations.
+  ///
+  /// Uses the path specified by [document]. Takes a [password] for
+  /// encrypted documents, and [config] for viewer customization.
+  Future<void> openDocumentDifference({
+    required String document1,
+    required String document2,
+    Config? config,
+  }) {
+    return _channel
+        .invokeMethod(Functions.openDocumentDifference, <String, dynamic>{
+      Parameters.document1: document1,
+      Parameters.document2: document2,
+      Parameters.config: jsonEncode(config),
+    });
+  }
+
   /// Imports the given XFDF annotation string to the current document.
   Future<void> importAnnotations(String xfdf) {
     return _channel.invokeMethod(

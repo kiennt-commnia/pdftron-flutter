@@ -56,7 +56,7 @@ class PdftronFlutter {
     });
   }
 
-  /// Opens a document in the viewer with configurations.
+  /// Opens a document comparison in the viewer with configurations.
   ///
   /// Uses the path specified by [document]. Takes a [password] for
   /// encrypted documents, and [config] for viewer customization.

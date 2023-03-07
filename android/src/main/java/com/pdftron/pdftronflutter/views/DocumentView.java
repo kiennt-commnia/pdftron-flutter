@@ -11,6 +11,8 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.FragmentManager;
 
+import com.pdftron.common.PDFNetException;
+import com.pdftron.pdf.annots.Ink.BlendMode;
 import com.pdftron.pdf.Annot;
 import com.pdftron.pdf.PDFDoc;
 import com.pdftron.pdf.PDFViewCtrl;
@@ -20,6 +22,9 @@ import com.pdftron.pdf.config.ViewerBuilder2;
 import com.pdftron.pdf.config.ViewerConfig;
 import com.pdftron.pdf.controls.PdfViewCtrlTabFragment2;
 import com.pdftron.pdf.controls.PdfViewCtrlTabHostFragment2;
+import com.pdftron.pdf.ColorPt;
+import com.pdftron.pdf.DiffOptions;
+import com.pdftron.pdf.ProgressMonitor;
 import com.pdftron.pdf.tools.ToolManager;
 import com.pdftron.pdf.utils.Utils;
 import com.pdftron.pdftronflutter.R;
@@ -28,8 +33,10 @@ import com.pdftron.pdftronflutter.helpers.ViewerComponent;
 import com.pdftron.pdftronflutter.helpers.ViewerImpl;
 import com.pdftron.pdftronflutter.nativeviews.FlutterPdfViewCtrlTabFragment;
 import com.pdftron.pdftronflutter.nativeviews.FlutterPdfViewCtrlTabHostFragment;
+import com.pdftron.sdf.SDFDoc.SaveMode;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -165,6 +172,63 @@ public class DocumentView extends com.pdftron.pdf.controls.DocumentView2 impleme
         mDetached = false;
         prepView();
         attachListeners();
+    }
+
+    public void openDocumentDifference(String document1, String document2, String configStr,
+            MethodChannel.Result result) throws PDFNetException, IOException {
+        // Compose visual diff
+        final PDFDoc doc1 = new PDFDoc(document1);
+        final PDFDoc doc2 = new PDFDoc(document2);
+        final DiffOptions opts = new DiffOptions();
+        opts.setBlendMode(BlendMode.DARKEN.getValue());
+        opts.setColorA(new ColorPt(1, 0, 0));
+        opts.setColorB(new ColorPt(0, 1, 1));
+        final PDFDoc docMerged = new PDFDoc();
+        docMerged.appendVisualDiff(doc1.getPage(1), doc2.getPage(1), opts);
+        File tempFile = File.createTempFile("tmp", ".pdf");
+        final String document = tempFile.getPath();
+        final ProgressMonitor monitor = new ProgressMonitor() {
+            @Override
+            public int getPos() {
+                return 0;
+            }
+
+            @Override
+            public int getRangeFinish() {
+                return 0;
+            }
+
+            @Override
+            public int getRangeStart() {
+                return 0;
+            }
+
+            @Override
+            public int offsetPos(int offset) {
+                return 0;
+            }
+
+            @Override
+            public int setPos(int pos) {
+                return 0;
+            }
+
+            @Override
+            public void setRange(int start, int finish) {
+            }
+
+            @Override
+            public int setStep(int nstep) {
+                return 0;
+            }
+
+            @Override
+            public int stepIt() {
+                return 0;
+            }
+        };
+        docMerged.save(document, SaveMode.NO_FLAGS, monitor);
+        openDocument(document, null, configStr, result);
     }
 
     @Override
