@@ -6,6 +6,8 @@ import com.pdftron.common.PDFNetException;
 import com.pdftron.pdf.PDFNet;
 import com.pdftron.pdftronflutter.FlutterDocumentActivity;
 
+import java.io.IOException;
+
 import io.flutter.plugin.common.BinaryMessenger;
 import io.flutter.plugin.common.EventChannel;
 import io.flutter.plugin.common.MethodCall;
@@ -18,10 +20,13 @@ import static com.pdftron.pdftronflutter.helpers.PluginUtils.FUNCTION_GET_PLATFO
 import static com.pdftron.pdftronflutter.helpers.PluginUtils.FUNCTION_GET_VERSION;
 import static com.pdftron.pdftronflutter.helpers.PluginUtils.FUNCTION_INITIALIZE;
 import static com.pdftron.pdftronflutter.helpers.PluginUtils.FUNCTION_OPEN_DOCUMENT;
+import static com.pdftron.pdftronflutter.helpers.PluginUtils.FUNCTION_OPEN_DOCUMENT_DIFFERENCE;
 import static com.pdftron.pdftronflutter.helpers.PluginUtils.FUNCTION_SET_LEADING_NAV_BUTTON_ICON;
 import static com.pdftron.pdftronflutter.helpers.PluginUtils.FUNCTION_SET_REQUESTED_ORIENTATION;
 import static com.pdftron.pdftronflutter.helpers.PluginUtils.KEY_CONFIG;
 import static com.pdftron.pdftronflutter.helpers.PluginUtils.KEY_DOCUMENT;
+import static com.pdftron.pdftronflutter.helpers.PluginUtils.KEY_DOCUMENT1;
+import static com.pdftron.pdftronflutter.helpers.PluginUtils.KEY_DOCUMENT2;
 import static com.pdftron.pdftronflutter.helpers.PluginUtils.KEY_LEADING_NAV_BUTTON_ICON;
 import static com.pdftron.pdftronflutter.helpers.PluginUtils.KEY_LICENSE_KEY;
 import static com.pdftron.pdftronflutter.helpers.PluginUtils.KEY_PASSWORD;
@@ -305,6 +310,21 @@ public class PluginMethodCallHandler implements MethodCallHandler {
                 String config = call.argument(KEY_CONFIG);
                 FlutterDocumentActivity.setFlutterLoadResult(result);
                 FlutterDocumentActivity.openDocument(mContext, document, password, config);
+                break;
+            case FUNCTION_OPEN_DOCUMENT_DIFFERENCE:
+                String document1 = call.argument(KEY_DOCUMENT1);
+                String document2 = call.argument(KEY_DOCUMENT2);
+                String diffConfig = call.argument(KEY_CONFIG);
+                FlutterDocumentActivity.setFlutterLoadResult(result);
+                try {
+                    FlutterDocumentActivity.openDocumentDifference(mContext, document1, document2, diffConfig);
+                } catch (PDFNetException e) {
+                    e.printStackTrace();
+                    result.error(Long.toString(e.getErrorCode()), "PDFTronException Error: " + e, null);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                    result.error(Long.toString(11), "PDFTron IOException Error: " + e, null);
+                }
                 break;
             case FUNCTION_SET_LEADING_NAV_BUTTON_ICON: {
                 String leadingNavButtonIcon = call.argument(KEY_LEADING_NAV_BUTTON_ICON);

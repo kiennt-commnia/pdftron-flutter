@@ -85,6 +85,8 @@ import io.flutter.plugin.common.MethodChannel;
 public class PluginUtils {
 
     public static final String KEY_LICENSE_KEY = "licenseKey";
+    public static final String KEY_DOCUMENT1 = "document1";
+    public static final String KEY_DOCUMENT2 = "document2";
     public static final String KEY_DOCUMENT = "document";
     public static final String KEY_PASSWORD = "password";
     public static final String KEY_CONFIG = "config";
@@ -287,6 +289,7 @@ public class PluginUtils {
     public static final String FUNCTION_GET_VERSION = "getVersion";
     public static final String FUNCTION_INITIALIZE = "initialize";
     public static final String FUNCTION_OPEN_DOCUMENT = "openDocument";
+    public static final String FUNCTION_OPEN_DOCUMENT_DIFFERENCE = "openDocumentDifference";
     public static final String FUNCTION_IMPORT_ANNOTATION_COMMAND = "importAnnotationCommand";
     public static final String FUNCTION_IMPORT_BOOKMARK_JSON = "importBookmarkJson";
     public static final String FUNCTION_SAVE_DOCUMENT = "saveDocument";
