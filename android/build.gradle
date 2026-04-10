@@ -26,7 +26,8 @@ apply plugin: 'com.android.library'
 
 android {
     namespace "com.pdftron.pdftronflutter"
-    compileSdkVersion 33
+    // Match host apps targeting API 35+ / 16 KB page size (Play); Apryse 11.9+ ships 16 KB–aligned native libs.
+    compileSdkVersion 35
 
     defaultConfig {
         minSdkVersion 19
@@ -38,7 +39,7 @@ android {
 }
 
 dependencies {
-    // Apryse SDK dependencies
-    implementation "com.pdftron:pdftron:10.11.0"
-    implementation "com.pdftron:tools:10.11.0"
+    // Apryse SDK — 11.9+ required for 16 KB memory page support (arm64/x86_64).
+    implementation "com.pdftron:pdftron:11.12.0"
+    implementation "com.pdftron:tools:11.12.0"
 }
